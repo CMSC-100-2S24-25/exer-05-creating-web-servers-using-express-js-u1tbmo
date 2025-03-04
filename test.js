@@ -67,7 +67,7 @@ function addAnotherValidBookTest() {
 		bookName: "Fellow Travelers",
 		isbn: "978-03-07388-90-2",
 		author: "Thomas Mallon",
-		year: 2008,
+		year: 2007,
 	};
 
 	needle.post(addBookEndpoint, data, (err, res) => {
