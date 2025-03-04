@@ -66,7 +66,7 @@ function findByIsbnAuthor(req, res) {
 	const authorQuery = req.query.author;
 
 	if (!isbnQuery || !authorQuery) {
-		return res.send("Error: invalid parameters");
+		return res.send({ error: "Invalid parameters" });
 	}
 
 	// Read lines from database
@@ -78,21 +78,24 @@ function findByIsbnAuthor(req, res) {
 		for (const line of lines) {
 			const [bookName, isbn, author, year] = line.split(",");
 			if (isbn === isbnQuery && author === authorQuery) {
-				return res.send(
-					`Book: ${bookName}<br>ISBN: ${isbn}<br>Author: ${author}<br>Year: ${year}`,
-				);
+				return res.send({
+					bookName: bookName,
+					isbn: isbn,
+					author: author,
+					year: year,
+				});
 			}
 		}
 	} catch (err) {}
 
 	// No match
-	return res.send("Oops! There are no entries that match that criteria.");
+	return res.send({ error: "Book not found" });
 }
 
 function findByAuthor(req, res) {
 	const authorQuery = req.query.author;
 
-	let books = "";
+	const books = [];
 
 	if (!authorQuery) {
 		return res.send("Error: invalid author");
@@ -107,7 +110,12 @@ function findByAuthor(req, res) {
 		for (const line of lines) {
 			const [bookName, isbn, author, year] = line.split(",");
 			if (author === authorQuery) {
-				books += `Book: ${bookName}<br>ISBN: ${isbn}<br>Author: ${author}<br>Year: ${year}<br>`;
+				books.push({
+					bookName: bookName,
+					isbn: isbn,
+					author: author,
+					year: year,
+				});
 			}
 		}
 	} catch (err) {}
