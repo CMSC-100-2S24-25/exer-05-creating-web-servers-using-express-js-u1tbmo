@@ -56,8 +56,44 @@ function addBook(req, res) {
 	}
 }
 
+/**
+ * Retrieves the details of a single book using ISBN and Author as search criteria
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
+function findByIsbnAuthor(req, res) {
+	const isbnQuery = req.query.isbn;
+	const authorQuery = req.query.author;
+
+	if (!isbnQuery || !authorQuery) {
+		return res.send("Error: invalid parameters");
+	}
+
+	// Read lines from database
+	try {
+		const file = readFileSync(booksData, "utf-8");
+		const lines = file.split("\n");
+		lines.pop(); // Remove empty entry
+
+		for (const line of lines) {
+			const [bookName, isbn, author, year] = line.split(",");
+			if (isbn === isbnQuery && author === authorQuery) {
+				return res.send(
+					`Book: ${bookName}<br>ISBN: ${isbn}<br>Author: ${author}<br>Year: ${year}`,
+				);
+			}
+		}
+	} catch (err) {}
+
+	// No match
+	return res.send("Oops! There are no entries that match that criteria.");
+}
+
 // POST method at add-book
 app.post("/add-book", addBook);
+
+// GET method at find-by-isbn-author
+app.get("/find-by-isbn-author", findByIsbnAuthor);
 
 // Listen for requests
 app.listen(port, () => {
