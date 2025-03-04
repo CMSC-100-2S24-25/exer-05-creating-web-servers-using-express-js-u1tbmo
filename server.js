@@ -35,10 +35,8 @@ function addBook(req, res) {
 		const file = readFileSync(booksData, "utf-8");
 		const lines = file.split("\n");
 		lines.pop(); // Remove empty entry
-		console.log(lines);
 
 		for (const line of lines) {
-			console.log(line.split());
 			if (line.split(",")[1] === isbn) {
 				return res.send({ success: false });
 			}
