@@ -1,3 +1,9 @@
+/* Tabamo, Euan Jed S.
+2023-10822
+March 4, 2025
+CMSC 100 C1L
+*/
+
 import needle from "needle";
 import { unlinkSync } from "node:fs";
 
