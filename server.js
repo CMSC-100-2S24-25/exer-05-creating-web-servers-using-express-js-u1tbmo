@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
  */
 function addBook(req, res) {
 	const { bookName, isbn, author, year } = req.body;
+
 	// Validate request body
 	if (!bookName || !isbn || !author || !year) {
 		return res.send({ success: false });
@@ -36,6 +37,7 @@ function addBook(req, res) {
 		const lines = file.split("\n");
 		lines.pop(); // Remove empty entry
 
+		// Check if isbn already exists
 		for (const line of lines) {
 			if (line.split(",")[1] === isbn) {
 				return res.send({ success: false });
@@ -52,6 +54,7 @@ function addBook(req, res) {
 		// Send response that transaction is successful
 		return res.send({ success: true });
 	} catch (err) {
+		// Transaction failed
 		return res.send({ success: false });
 	}
 }
@@ -65,6 +68,7 @@ function findByIsbnAuthor(req, res) {
 	const isbnQuery = req.query.isbn;
 	const authorQuery = req.query.author;
 
+	// Validate queries
 	if (!isbnQuery || !authorQuery) {
 		return res.send({ error: "Invalid parameters" });
 	}
@@ -75,6 +79,7 @@ function findByIsbnAuthor(req, res) {
 		const lines = file.split("\n");
 		lines.pop(); // Remove empty entry
 
+		// Check for the specific book using isbn (unique) and author query
 		for (const line of lines) {
 			const [bookName, isbn, author, year] = line.split(",");
 			if (isbn === isbnQuery && author === authorQuery) {
@@ -88,18 +93,25 @@ function findByIsbnAuthor(req, res) {
 		}
 	} catch (err) {}
 
-	// No match
+	// No book matches
 	return res.send({ error: "Book not found" });
 }
 
+/**
+ * Retrieves the books from an author
+ * @param {Object} req the request
+ * @param {Object} res the response
+ */
 function findByAuthor(req, res) {
 	const authorQuery = req.query.author;
 
-	const books = [];
-
+	// Validate query
 	if (!authorQuery) {
 		return res.send("Error: invalid author");
 	}
+
+	// Initialize list of books
+	const books = [];
 
 	// Read lines from database
 	try {
@@ -107,6 +119,7 @@ function findByAuthor(req, res) {
 		const lines = file.split("\n");
 		lines.pop(); // Remove empty entry
 
+		// Check for the books with the author query
 		for (const line of lines) {
 			const [bookName, isbn, author, year] = line.split(",");
 			if (author === authorQuery) {
@@ -120,7 +133,7 @@ function findByAuthor(req, res) {
 		}
 	} catch (err) {}
 
-	// No match
+	// No books match
 	if (books.length === 0) {
 		return res.send("Oops! There are no entries that match that criteria.");
 	}
