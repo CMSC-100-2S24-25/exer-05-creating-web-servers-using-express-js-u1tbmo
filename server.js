@@ -89,11 +89,46 @@ function findByIsbnAuthor(req, res) {
 	return res.send("Oops! There are no entries that match that criteria.");
 }
 
+function findByAuthor(req, res) {
+	const authorQuery = req.query.author;
+
+	let books = "";
+
+	if (!authorQuery) {
+		return res.send("Error: invalid author");
+	}
+
+	// Read lines from database
+	try {
+		const file = readFileSync(booksData, "utf-8");
+		const lines = file.split("\n");
+		lines.pop(); // Remove empty entry
+
+		for (const line of lines) {
+			const [bookName, isbn, author, year] = line.split(",");
+			if (author === authorQuery) {
+				books += `Book: ${bookName}<br>ISBN: ${isbn}<br>Author: ${author}<br>Year: ${year}<br>`;
+			}
+		}
+	} catch (err) {}
+
+	// No match
+	if (books.length === 0) {
+		return res.send("Oops! There are no entries that match that criteria.");
+	}
+
+	// Respond with all books
+	return res.send(books);
+}
+
 // POST method at add-book
 app.post("/add-book", addBook);
 
 // GET method at find-by-isbn-author
 app.get("/find-by-isbn-author", findByIsbnAuthor);
+
+// GET method at find-by-author
+app.get("/find-by-author", findByAuthor);
 
 // Listen for requests
 app.listen(port, () => {
